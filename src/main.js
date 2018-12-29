@@ -77,6 +77,7 @@ class Main extends React.Component {
     }
     handleSearchClick() {
       this.setState( {currentPage : 1, movieUrl: this.getUrl(1)});
+       console.log("current url is "  + this.getUrl(1));
     }
     /* 
     componentDidMount() is invoked immediately after a component is mounted (inserted into the tree). 
@@ -84,15 +85,25 @@ class Main extends React.Component {
       If you need to load data from a remote endpoint, this is a good place to instantiate the network request
     */
     componentDidMount() {
+      const savedState = this.getStateFromLocalStorage();
+      if (savedState) { /* never persisted */
+        this.setState({ ...savedState });
+        console.log('genres is ' + savedState.genres);
+      }
+      else {
+        // Fetch genres if we need them
         const genresURL = `https://api.themoviedb.org/3/genre/movie/list?api_key=${process.env.REACT_APP_TMDB_API_KEY}&language=en-US`
-          fetch(genresURL)
-            .then(response => response.json())
-            .then(data => this.setState({genres: data.genres }))
-            .catch(error => console.log(error));
+        fetch(genresURL)
+                    .then(response => response.json())
+                    .then(data => this.setState({genres: data.genres }))
+                    .catch(error => console.log(error));
+      }
+    
     }
 
     // React to changes in updating state
     componentWillUpdate(nextProps, nextState) {
+      this.saveStateToLocalStorage();
       // if (this.state.moviesUrl !== nextState.moviesUrl) {
         
       //   this.fetchMovies(nextState.moviesUrl);
@@ -116,6 +127,14 @@ class Main extends React.Component {
     }
   }
   
+  saveStateToLocalStorage = () => {
+    localStorage.setItem("movieapp.params", JSON.stringify(this.state));
+  }
+
+  getStateFromLocalStorage = () => {
+    return JSON.parse(localStorage.getItem("movieapp.params"));
+  }
+
   storeMovieData(movieData) {
       const movieResults = movieData.results.map(movieEntry => {
         // Get relevant entries from JSON result
