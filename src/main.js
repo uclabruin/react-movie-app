@@ -3,6 +3,7 @@ import "./main.css"
 import Navigation from "./navigation";
 import Movies from "./movie";
 
+// default url which has all movies initially
 const apiUrl = `https://api.themoviedb.org/3/discover/movie?api_key=${process.env.REACT_APP_TMDB_API_KEY}&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1`
 
 class Main extends React.Component {
@@ -84,19 +85,24 @@ class Main extends React.Component {
       Initialization that requires DOM nodes should go here. 
       If you need to load data from a remote endpoint, this is a good place to instantiate the network request
     */
-    componentDidMount() {
-      const savedState = this.getStateFromLocalStorage();
-      if (savedState) { /* never persisted */
-        this.setState({ ...savedState });
-        console.log('genres is ' + savedState.genres);
-      }
-      else {
-        // Fetch genres if we need them
+     fetchGenres() {
+       // Fetch genres if we need them
         const genresURL = `https://api.themoviedb.org/3/genre/movie/list?api_key=${process.env.REACT_APP_TMDB_API_KEY}&language=en-US`
         fetch(genresURL)
                     .then(response => response.json())
-                    .then(data => this.setState({genres: data.genres }))
+                    .then(data => this.setState({genres: data.genres, genre : data.genres[0].name, genreId : data.genres[0].id}))
                     .catch(error => console.log(error));
+    }
+    componentDidMount() {
+      const savedState = this.getStateFromLocalStorage();
+      if (savedState) { /* never persisted */
+        console.log("From saved state id is " + savedState.genreId);
+        this.setState({ ...savedState });
+        if (!savedState.genres.length)
+          this.fetchGenres();
+      }
+      else {
+         this.fetchGenres();
       }
     
     }
@@ -152,6 +158,7 @@ class Main extends React.Component {
     }
 
   render() {
+    console.log('genre is ' + this.state.genre + ' with id ' + this.state.genreId);
     return (
       <section className="main">
         <Navigation

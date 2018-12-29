@@ -33,7 +33,8 @@ class Navigation extends React.Component {
     const { genre, genres, handleGenreChange, handleSliderChange, handleSearchClick, year, rating, runtime } = this.props;
     return (
       <section className="navigation">
-        Navigation
+        <h1> Navigation </h1>
+        Select Genre:
         <Selection onChange={handleGenreChange} genres = {genres} genre ={genre}> </Selection>
         <Slider onChange={ handleSliderChange} data={year}> </Slider>
         <Slider onChange={ handleSliderChange } data={rating}> </Slider>
