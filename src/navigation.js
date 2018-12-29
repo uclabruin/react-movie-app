@@ -30,7 +30,7 @@ class Navigation extends React.Component {
     }
 
   render() {
-    const { genre, genres, handleGenreChange, handleSliderChange, handleClick, year, rating, runtime } = this.props;
+    const { genre, genres, handleGenreChange, handleSliderChange, handleSearchClick, year, rating, runtime } = this.props;
     return (
       <section className="navigation">
         Navigation
@@ -38,7 +38,7 @@ class Navigation extends React.Component {
         <Slider onChange={ handleSliderChange} data={year}> </Slider>
         <Slider onChange={ handleSliderChange } data={rating}> </Slider>
         <Slider onChange={ handleSliderChange} data={runtime}> </Slider>
-        <SearchButton onClick={handleClick} ></SearchButton>
+        <SearchButton onClick={handleSearchClick} ></SearchButton>
         </section>
     )
   }

@@ -10,6 +10,7 @@ class Main extends React.Component {
         super(props);
         this.state = {
             totalPages:1,
+            currentPage:1,
             movies: [],
             movieUrl: apiUrl,
             genres:[],
@@ -46,7 +47,8 @@ class Main extends React.Component {
               this.setState({
                   genre: selectedGenreObj.name,
                   genreId: selectedGenreObj.id
-               });       
+               });      
+              console.log('id is ' + this.state.genreId); 
             }
 
     handleSliderChange(data) {
@@ -58,25 +60,29 @@ class Main extends React.Component {
         });
      }
 
-    handleOnClick() {
-      const {genreId, year, rating, runtime} = this.state;
-      console.log ('genre id is ' + this.props.genreId);
-
-      const updateUrl = `https://api.themoviedb.org/3/discover/movie?` +
-                        `api_key=${process.env.REACT_APP_TMDB_API_KEY}&` +
-                        `language=en-US&sort_by=popularity.desc&` +
-                        `with_genres=${genreId}&` +
-                        `primary_release_date.gte=${year.value.min}-01-01&` +
-                        `primary_release_date.lte=${year.value.max}-12-31&` +
-                        `vote_average.gte=${rating.value.min}&` +
-                        `vote_average.lte=${rating.value.max}&` +
-                        `with_runtime.gte=${runtime.value.min}&` +
-                        `with_runtime.lte=${runtime.value.max}&` +
-                        `page=1&`;
-      this.setState( {movieUrl: updateUrl});
+    getUrl(currentPage) {
+       const {genreId, year, rating, runtime} = this.state;
+        const url = `https://api.themoviedb.org/3/discover/movie?` +
+                          `api_key=${process.env.REACT_APP_TMDB_API_KEY}&` +
+                          `language=en-US&sort_by=popularity.desc&` +
+                          `with_genres=${genreId}&` +
+                          `primary_release_date.gte=${year.value.min}-01-01&` +
+                          `primary_release_date.lte=${year.value.max}-12-31&` +
+                          `vote_average.gte=${rating.value.min}&` +
+                          `vote_average.lte=${rating.value.max}&` +
+                          `with_runtime.gte=${runtime.value.min}&` +
+                          `with_runtime.lte=${runtime.value.max}&` +
+                          `page=${currentPage}&`;
+        return url;
     }
-    
-    // Fetch genres for dropdown list
+    handleSearchClick() {
+      this.setState( {currentPage : 1, movieUrl: this.getUrl(1)});
+    }
+    /* 
+    componentDidMount() is invoked immediately after a component is mounted (inserted into the tree). 
+      Initialization that requires DOM nodes should go here. 
+      If you need to load data from a remote endpoint, this is a good place to instantiate the network request
+    */
     componentDidMount() {
         const genresURL = `https://api.themoviedb.org/3/genre/movie/list?api_key=${process.env.REACT_APP_TMDB_API_KEY}&language=en-US`
           fetch(genresURL)
@@ -85,6 +91,31 @@ class Main extends React.Component {
             .catch(error => console.log(error));
     }
 
+    // React to changes in updating state
+    componentWillUpdate(nextProps, nextState) {
+      // if (this.state.moviesUrl !== nextState.moviesUrl) {
+        
+      //   this.fetchMovies(nextState.moviesUrl);
+      // }
+    }
+
+  handlePageTurn (dir) {
+    if (dir === "Next")
+    {
+      const updatePage = this.state.currentPage + 1;
+      if (updatePage < this.state.totalPages)
+        this.setState ({currentPage: updatePage, movieUrl: this.getUrl(updatePage)});
+    }
+    else
+    {
+      console.log("PreviousPage");
+      const updatePage = this.state.currentPage - 1;
+
+     if (updatePage > 0)
+        this.setState ( {currentPage: updatePage, movieUrl: this.getUrl(updatePage)});
+    }
+  }
+  
   storeMovieData(movieData) {
       const movieResults = movieData.results.map(movieEntry => {
         // Get relevant entries from JSON result
@@ -94,8 +125,11 @@ class Main extends React.Component {
      });
       this.setState({
       movies: movieResults,
-      totalPages:movieData.total_pages
+      totalPages:movieData.total_pages,
+      currentPage:movieData.page
      });  
+      // console.log('current page is ' + movieData.currentPage);
+      // console.log('total page is ' + movieData.totalPages);
     }
 
   render() {
@@ -104,14 +138,19 @@ class Main extends React.Component {
         <Navigation
             handleGenreChange={ (event) => this.handleGenreChange(event) }
             handleSliderChange={ (data) => this.handleSliderChange(data) }
-            handleClick = { () => this.handleOnClick() }
+            handleSearchClick = { () => this.handleSearchClick() }
             genre={this.state.genre}
             genres={this.state.genres}
             year={this.state.year} 
             rating={this.state.rating}
             runtime={this.state.runtime}
         ></Navigation>
-        <Movies movies ={this.state.movies} apiUrl={this.state.movieUrl} movieUpdateCb={ (data) => this.storeMovieData(data)}/>
+        <Movies 
+            movies ={this.state.movies} 
+            apiUrl={this.state.movieUrl} 
+            movieUpdateCb={ (data) => this.storeMovieData(data) }
+            pageOnClick= { (dir) => this.handlePageTurn(dir) }
+            currentPage  = {this.state.currentPage }/>
       </section>
     )
   }

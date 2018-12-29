@@ -34,11 +34,6 @@ class MovieList extends React.Component{
             {    
                  this.props.movies.map( movieEntry => <MovieListItem movieInfo={movieEntry} /> )
             }
-        <div className="pagination">
-          <button >Previous</button>
-          <span>{`Page 1`}</span>
-          <button >Next</button>
-        </div>
         </div>
         );
     }
@@ -52,6 +47,8 @@ class Movies extends React.Component {
     }
 
   getMovieData = (url) => {
+     console.log('fetch url is ' + url);
+
     fetch(url)
         .then(response => response.json())
         .then(data => { this.props.movieUpdateCb(data); } )
@@ -63,10 +60,10 @@ class Movies extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    // if (this.props.apiUrl !== nextProps.apiUrl) {
+    if (this.props.apiUrl !== nextProps.apiUrl) {
       console.log('url is ' + nextProps.apiUrl);
       this.getMovieData(nextProps.apiUrl);
-    // }
+    }
   }
 
   render() {
@@ -74,6 +71,11 @@ class Movies extends React.Component {
     return (
       <section className="movies">
        <MovieList movies ={this.props.movies}/>
+        <div className="pagination">
+          <button onClick={ () => {this.props.pageOnClick("Previous") } }>Previous</button>
+          <span>{`Page ${this.props.currentPage}`}</span>
+          <button onClick={ () => {this.props.pageOnClick("Next")} }>Next</button>
+        </div>
       </section>
     )
   }
