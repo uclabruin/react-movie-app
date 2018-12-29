@@ -1,3 +1,6 @@
+*****To get this running, you need to have a valid API key from TMDB (https://www.themoviedb.org)
+and associate with "REACT_APP_TMDB_API_KEY" in .env****
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
