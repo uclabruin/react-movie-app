@@ -1,13 +1,17 @@
 import React from "react";
 import "./movie.css";
+import { Link } from "react-router-dom";
+
 
 const MovieListItem = (data) => {
     const movieInfo = data.movieInfo;
     const imageSrc = "https://image.tmdb.org/t/p/" + "original/" + movieInfo.poster_path;
     const year = movieInfo.release_date.substring(0, 4);
-
+    const { id, title, poster_path, release_year, vote_average } = movieInfo;
+    console.log('ids is ' + id)
     return (<div className = "movie" >
             <li className="movie-item"  >
+             <Link to={`/movie_page/${id}`} className="thumbnail">
               <img src={imageSrc} alt="" />
               <div className="movie-description">
                 <h1>{movieInfo.title}</h1>
@@ -22,6 +26,7 @@ const MovieListItem = (data) => {
                   </div>
                 </div>
               </div>
+              </Link>
             </li>
             </div>);
 }

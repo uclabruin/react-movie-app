@@ -60,3 +60,11 @@
   justify-content: space-between;
   padding: 40px 20px;
 }
+
+.thumbnail {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  cursor: pointer;
+  text-decoration: none;
+}
