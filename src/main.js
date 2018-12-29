@@ -9,6 +9,8 @@ class Main extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            totalPages:1,
+            movies: [],
             movieUrl: apiUrl,
             genres:[],
             genre:'Action',
@@ -83,6 +85,19 @@ class Main extends React.Component {
             .catch(error => console.log(error));
     }
 
+  storeMovieData(movieData) {
+      const movieResults = movieData.results.map(movieEntry => {
+        // Get relevant entries from JSON result
+      const  { vote_count, id, genre_ids, poster_path, title, vote_average, release_date } = movieEntry;
+          // return relevant entries
+        return { vote_count, id, genre_ids, poster_path, title, vote_average, release_date };
+     });
+      this.setState({
+      movies: movieResults,
+      totalPages:movieData.total_pages
+     });  
+    }
+
   render() {
     return (
       <section className="main">
@@ -96,7 +111,7 @@ class Main extends React.Component {
             rating={this.state.rating}
             runtime={this.state.runtime}
         ></Navigation>
-        <Movies apiUrl={this.state.movieUrl}/>
+        <Movies movies ={this.state.movies} apiUrl={this.state.movieUrl} movieUpdateCb={ (data) => this.storeMovieData(data)}/>
       </section>
     )
   }

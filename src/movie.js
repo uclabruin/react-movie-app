@@ -34,6 +34,11 @@ class MovieList extends React.Component{
             {    
                  this.props.movies.map( movieEntry => <MovieListItem movieInfo={movieEntry} /> )
             }
+        <div className="pagination">
+          <button >Previous</button>
+          <span>{`Page 1`}</span>
+          <button >Next</button>
+        </div>
         </div>
         );
     }
@@ -44,32 +49,17 @@ const defaultUrl = `https://api.themoviedb.org/3/discover/movie?api_key=${proces
 class Movies extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {
-            movies: [],
-            apiUrl: defaultUrl
-        };
-
-    }
-  storeMovieData(movieData) {
-      const movieResults = movieData.results.map(movieEntry => {
-        // Get relevant entries from JSON result
-      const  { vote_count, id, genre_ids, poster_path, title, vote_average, release_date } = movieEntry;
-          // return relevant entries
-        return { vote_count, id, genre_ids, poster_path, title, vote_average, release_date };
-     });
-      this.setState({
-      movies: movieResults
-     });  
     }
 
   getMovieData = (url) => {
     fetch(url)
         .then(response => response.json())
-        .then(data => { this.storeMovieData(data); } )
+        .then(data => { this.props.movieUpdateCb(data); } )
         .catch(error => console.log(error))
   }
+
  componentDidMount() {
-    this.getMovieData(this.state.apiUrl);
+    this.getMovieData(this.props.apiUrl);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -83,7 +73,7 @@ class Movies extends React.Component {
     // this.setState({apiUrl: this.props.apiUrl});
     return (
       <section className="movies">
-       <MovieList movies ={this.state.movies}/>
+       <MovieList movies ={this.props.movies}/>
       </section>
     )
   }
